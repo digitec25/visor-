@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor de PDF</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        iframe { width: 80%; height: 90vh; border: 1px solid black; }
+        input, button { margin: 5px; padding: 8px; }
+    </style>
+</head>
+<body>
+    <h2>Visor de PDF</h2>
+    <input type="text" id="urlInput" placeholder="Ingrese URL del PDF">
+    <button id="loadPdf">Cargar PDF</button>
+    <button id="copyLink">Copiar enlace</button>
+    <br><br>
+    <iframe id="pdfViewer"></iframe>
+
+    <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        function updateURL(pdfUrl) {
+            const newUrl = window.location.origin + window.location.pathname + "?pdf=" + encodeURIComponent(pdfUrl);
+            window.history.pushState({ path: newUrl }, "", newUrl);
+        }
+
+        function loadPDF(url) {
+            if (url.includes("dropbox.com")) {
+                url = url.replace("?dl=0", "?raw=1");
+            }
+            document.getElementById("pdfViewer").src = url;
+            updateURL(url);
+        }
+
+        document.getElementById("loadPdf").addEventListener("click", function() {
+            let url = document.getElementById("urlInput").value;
+            if (url) loadPDF(url);
+        });
+
+        document.getElementById("copyLink").addEventListener("click", function() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert("Enlace copiado al portapapeles");
+            });
+        });
+
+        // Cargar automáticamente el PDF si hay un parámetro en la URL
+        window.onload = function() {
+            const pdfUrl = getQueryParam("pdf");
+            if (pdfUrl) {
+                document.getElementById("urlInput").value = decodeURIComponent(pdfUrl);
+                loadPDF(decodeURIComponent(pdfUrl));
+            }
+        };
+    </script>
+</body>
+</html>
