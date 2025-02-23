@@ -3,60 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visor de PDF - Prueba secuencia 1</title>
+    <title>Visor de PDF desde Google Drive</title>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; }
-        iframe { width: 80%; height: 90vh; border: 1px solid black; }
-        input, button { margin: 5px; padding: 8px; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        input, button {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
     </style>
 </head>
 <body>
-    <h2>Visor de PDF</h2>
-    <input type="text" id="urlInput" placeholder="Ingrese URL del PDF">
-    <button id="loadPdf">Cargar PDF</button>
-    <button id="copyLink">Copiar enlace</button>
-    <br><br>
-    <iframe id="pdfViewer"></iframe>
+    <h1>Visor de PDF desde Google Drive</h1>
+    
+    <input type="text" id="pdfUrl" placeholder="">
+    <button onclick="loadPDF()">Cargar PDF</button>
+    
+    <iframe id="pdfViewer" src="https://drive.google.com/file/d/1js2FbtpFp3Jh6jp3P6Z2QePo-cL_jJ9j/preview"></iframe>
 
     <script>
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
-
-        function updateURL(pdfUrl) {
-            const newUrl = window.location.origin + window.location.pathname + "?pdf=" + encodeURIComponent(pdfUrl);
-            window.history.pushState({ path: newUrl }, "", newUrl);
-        }
-
-        function loadPDF(url) {
-            if (url.includes("dropbox.com")) {
-                url = url.replace("?dl=0", "?raw=1");
+        function loadPDF() {
+            let urlInput = document.getElementById("pdfUrl").value;
+            let fileId = urlInput.match(/[-\w]{25,}/);
+            
+            if (fileId) {
+                let embedUrl = `https://drive.google.com/file/d/${fileId[0]}/preview`;
+                document.getElementById("pdfViewer").src = embedUrl;
+            } else {
+                alert("Por favor, ingresa un enlace válido de Google Drive.");
             }
-            document.getElementById("pdfViewer").src = url;
-            updateURL(url);
         }
-
-        document.getElementById("loadPdf").addEventListener("click", function() {
-            let url = document.getElementById("urlInput").value;
-            if (url) loadPDF(url);
-        });
-
-        document.getElementById("copyLink").addEventListener("click", function() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                alert("Enlace copiado al portapapeles");
-            });
-        });
-
-        // Cargar automáticamente el PDF si hay un parámetro en la URL
-        window.onload = function() {
-            const pdfUrl = getQueryParam("pdf");
-            if (pdfUrl) {
-                document.getElementById("urlInput").value = decodeURIComponent(pdfUrl);
-                loadPDF(decodeURIComponent(pdfUrl));
-            }
-        };
     </script>
-    Visor
 </body>
 </html>
